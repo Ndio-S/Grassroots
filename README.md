@@ -1,2 +1,3 @@
 # Grassroots
 Revolutionise lower-league football engagement
+Grassroots TM is an innovative platform designed to enhance the visibility and engagement of lower-league football in the UK. By leveraging geolocation technology and strategic partnerships, the platform will provide personalised recommendations for nearby matches and offer in-depth insights into local clubs, increasing attendance and strengthening community ties. The startup aims to solve the visibility and accessibility challenges grassroots football faces, creating a sustainable ecosystem that benefits fans, clubs, and local businesses.
