@@ -3,29 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grassroots TM - Football Clubs Map</title>
+    <title>Grassroots TM - Nearby Football Clubs</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <link rel="stylesheet" href="styles.css"> <!-- Optional for better UI -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h2>Grassroots TM - Football Clubs in the UK</h2>
-    <p>Explore local football clubs and their stadiums.</p>
+    <h2>Grassroots TM - Nearby Football Clubs</h2>
+    
+    <p>Your location: <span id="user-location">Fetching...</span></p>
+    <p>Total clubs near you: <span id="club-count">0</span></p>
 
-    <!-- Search Bar -->
-    <input type="text" id="searchBox" placeholder="Search for a club..." onkeyup="searchClub()" style="width: 300px; padding: 10px; margin: 10px;">
-
-    <!-- League Filter -->
-    <div>
-        <label><input type="checkbox" class="league-filter" value="Premier League" checked> Premier League</label>
-        <label><input type="checkbox" class="league-filter" value="Championship" checked> Championship</label>
-        <label><input type="checkbox" class="league-filter" value="League One" checked> League One</label>
+    <!-- Dashboard Section -->
+    <div id="dashboard">
+        <div id="map"></div>
+        <div id="club-list">
+            <h3>Nearby Clubs</h3>
+            <ul id="club-results"></ul>
+        </div>
     </div>
 
-    <div id="map"></div>
-
-    <!-- Load external JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
