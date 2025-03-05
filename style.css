@@ -1,0 +1,3 @@
+body { font-family: Arial, sans-serif; text-align: center; }
+#map { height: 500px; width: 80%; margin: 20px auto; border-radius: 10px; }
+input[type="text"] { width: 300px; padding: 10px; margin: 10px; }
