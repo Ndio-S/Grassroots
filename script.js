@@ -1,5 +1,5 @@
 // Initialize the map
-var map = L.map('map').setView([53.5, -2.5], 6); // Center UK
+var map = L.map('map').setView([53.5, -2.5], 6); // Default UK center
 
 // Load OpenStreetMap tiles
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -8,51 +8,80 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // GitHub CSV URL
 var csvUrl = "https://raw.githubusercontent.com/Ndio-S/Grassroots/main/FC_with_coordinates.csv";
+var markers = [];
 
-var markers = []; // Store markers for filtering
+// Function to calculate distance between two coordinates (Haversine formula)
+function getDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Earth's radius in km
+    var dLat = (lat2 - lat1) * (Math.PI / 180);
+    var dLon = (lon2 - lon1) * (Math.PI / 180);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+}
 
 // Function to load and parse CSV
-function loadCSV(url) {
+function loadCSV(url, userLat, userLon) {
     Papa.parse(url, {
         download: true,
         header: true,
         complete: function(results) {
+            var nearbyClubs = [];
+            
             results.data.forEach(club => {
-                if (club.Latitude && club.Longitude && !isNaN(club.Latitude) && !isNaN(club.Longitude)) {
+                if (club.Latitude && club.Longitude) {
                     var lat = parseFloat(club.Latitude);
                     var lon = parseFloat(club.Longitude);
-                    
-                    if (lat !== 0 && lon !== 0) {  // Avoid invalid locations
-                        var marker = L.marker([lat, lon]).addTo(map)
+                    var distance = getDistance(userLat, userLon, lat, lon);
+
+                    if (distance <= 50) { // Only show clubs within 50km
+                        var marker = L.marker([lat, lon])
                             .bindPopup(`<b>${club["Club Name"]}</b><br>${club["Stadium Name"] || "Unknown Stadium"}<br><a href="${club["Wikipedia Link"]}" target="_blank">More Info</a>`);
-                        
-                        marker.league = club["League"] || "Unknown"; // Store league info
+                        marker.addTo(map);
                         markers.push(marker);
+
+                        nearbyClubs.push({
+                            name: club["Club Name"],
+                            stadium: club["Stadium Name"],
+                            distance: distance.toFixed(1)
+                        });
                     }
                 }
             });
 
-            // Attach event listener for checkboxes
-            document.querySelectorAll(".league-filter").forEach(checkbox => {
-                checkbox.addEventListener("change", filterByLeague);
+            // Display nearby clubs in the list
+            document.getElementById("club-count").textContent = nearbyClubs.length;
+            var clubResults = document.getElementById("club-results");
+            clubResults.innerHTML = "";
+            nearbyClubs.forEach(club => {
+                clubResults.innerHTML += `<li><b>${club.name}</b> - ${club.stadium} (${club.distance} km away)</li>`;
             });
         }
     });
 }
 
-// Function to get user location and highlight nearby clubs
+// Function to get user location
 function showUserLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
             var userLat = position.coords.latitude;
             var userLon = position.coords.longitude;
 
-            // Add a marker for the user's location
+            // Update user location text
+            document.getElementById("user-location").textContent = `Lat: ${userLat}, Lon: ${userLon}`;
+
+            // Center map on user
+            map.setView([userLat, userLon], 10);
+
+            // Add user marker
             L.marker([userLat, userLon], { color: "blue" })
                 .addTo(map)
                 .bindPopup("📍 You are here!");
 
-            map.setView([userLat, userLon], 10); // Zoom into user's location
+            // Load CSV and filter nearby clubs
+            loadCSV(csvUrl, userLat, userLon);
         }, function(error) {
             console.error("Error getting location:", error);
         });
@@ -61,37 +90,5 @@ function showUserLocation() {
     }
 }
 
-// Function to search for a club
-function searchClub() {
-    var input = document.getElementById("searchBox").value.toLowerCase();
-    map.eachLayer(function(layer) {
-        if (layer instanceof L.Marker) {
-            var popupText = layer.getPopup().getContent().toLowerCase();
-            if (popupText.includes(input)) {
-                layer.openPopup();
-            } else {
-                layer.closePopup();
-            }
-        }
-    });
-}
-
-// Function to filter clubs by league
-function filterByLeague() {
-    var checkedLeagues = [];
-    document.querySelectorAll(".league-filter:checked").forEach(checkbox => {
-        checkedLeagues.push(checkbox.value);
-    });
-
-    markers.forEach(marker => {
-        if (checkedLeagues.includes(marker.league)) {
-            map.addLayer(marker);
-        } else {
-            map.removeLayer(marker);
-        }
-    });
-}
-
-// Load CSV data and display markers
-loadCSV(csvUrl);
+// Run on page load
 showUserLocation();
