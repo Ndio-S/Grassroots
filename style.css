@@ -1,9 +1,8 @@
 body { font-family: Arial, sans-serif; text-align: center; }
-#map { height: 500px; /* Ensures the map is visible */
+#map { 
+    height: 500px;  /* Ensure the map is visible */
     width: 80%; 
     margin: 20px auto; 
     border-radius: 10px;
+    border: 1px solid #ccc;
 }
-#club-list { display: inline-block; vertical-align: top; width: 35%; padding: 10px; }
-ul { list-style-type: none; padding: 0; }
-li { padding: 5px; border-bottom: 1px solid #ddd; }
