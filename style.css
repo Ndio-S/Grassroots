@@ -1,5 +1,5 @@
 body { font-family: Arial, sans-serif; text-align: center; }
-#map { height: 400px; width: 60%; border-radius: 10px; display: inline-block; }
+#map { height: 500px; width: 80%; border-radius: 10px; display: inline-block; }
 #club-list { display: inline-block; vertical-align: top; width: 35%; padding: 10px; }
 ul { list-style-type: none; padding: 0; }
 li { padding: 5px; border-bottom: 1px solid #ddd; }
