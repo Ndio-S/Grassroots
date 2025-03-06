@@ -6,8 +6,34 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors",
 }).addTo(map);
 
-function searchClubs() {
-    var postcode = document.getElementById("postcode").value.trim().toUpperCase();
+// Function to get lat/lon from a postcode using OpenStreetMap API
+async function getCoordinates(postcode) {
+    let url = `https://nominatim.openstreetmap.org/search?format=json&q=${postcode}`;
+    let response = await fetch(url);
+    let data = await response.json();
+
+    if (data.length > 0) {
+        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    } else {
+        return null;
+    }
+}
+
+// Function to calculate distance (Haversine Formula)
+function getDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Earth's radius in km
+    var dLat = (lat2 - lat1) * (Math.PI / 180);
+    var dLon = (lon2 - lon1) * (Math.PI / 180);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c; // Distance in km
+}
+
+// Function to search clubs based on proximity
+async function searchClubs() {
+    var postcode = document.getElementById("postcode").value.trim();
     console.log("User entered postcode:", postcode); // Debugging
 
     if (!postcode) {
@@ -15,38 +41,57 @@ function searchClubs() {
         return;
     }
 
+    let userLocation = await getCoordinates(postcode);
+    if (!userLocation) {
+        alert("Invalid postcode. Try again.");
+        return;
+    }
+
+    console.log("User Location:", userLocation);
+
     Papa.parse(csvUrl, {
         download: true,
         header: true,
         complete: function (results) {
-            console.log("CSV Loaded:", results.data.length, "records"); // Debugging
+            console.log("CSV Loaded:", results.data.length, "records");
 
             var clubList = document.getElementById("club-list");
             clubList.innerHTML = "";
-            var foundClubs = results.data.filter(club => club.Postcode && club.Postcode.toUpperCase() === postcode);
+            var foundClubs = [];
 
-            console.log("Matching clubs found:", foundClubs.length); // Debugging
-
-            foundClubs.forEach(club => {
-                var listItem = document.createElement("li");
-                listItem.className = "club-item";
-                listItem.innerHTML = `
-                    <b>${club["Club Name"]}</b><br>
-                    League: ${club["League"] || "Unknown"}<br>
-                    <a href="${club["Website"]}" target="_blank">Visit Website</a>
-                `;
-                clubList.appendChild(listItem);
-
-                // Add marker to the map
+            results.data.forEach(club => {
                 if (club.Latitude && club.Longitude) {
-                    L.marker([parseFloat(club.Latitude), parseFloat(club.Longitude)])
-                        .addTo(map)
-                        .bindPopup(`<b>${club["Club Name"]}</b><br><a href="${club["Website"]}" target="_blank">Visit Website</a>`);
+                    var clubLat = parseFloat(club.Latitude);
+                    var clubLon = parseFloat(club.Longitude);
+                    var distance = getDistance(userLocation.lat, userLocation.lon, clubLat, clubLon);
+
+                    if (distance <= 10) { // Clubs within 10 miles (~16km)
+                        foundClubs.push({ 
+                            name: club["Club Name"],
+                            league: club["League"] || "Unknown",
+                            website: club["Website"],
+                            distance: distance.toFixed(1),
+                            lat: clubLat,
+                            lon: clubLon
+                        });
+
+                        // Add marker to map
+                        L.marker([clubLat, clubLon])
+                            .addTo(map)
+                            .bindPopup(`<b>${club["Club Name"]}</b><br><a href="${club["Website"]}" target="_blank">Visit Website</a>`);
+                    }
                 }
             });
 
+            console.log("Matching clubs found:", foundClubs.length);
+
             if (foundClubs.length === 0) {
-                clubList.innerHTML = "<p>No clubs found for this postcode. Try another one.</p>";
+                clubList.innerHTML = "<p>No clubs found within 10 miles. Try another postcode.</p>";
+            } else {
+                foundClubs.forEach(club => {
+                    clubList.innerHTML += `<li><b>${club.name}</b> - ${club.league} (${club.distance} miles away) 
+                        <br><a href="${club.website}" target="_blank">Visit Website</a></li>`;
+                });
             }
         }
     });
