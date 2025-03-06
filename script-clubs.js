@@ -1,4 +1,4 @@
-var csvUrl = "https://raw.githubusercontent.com/Ndio-S/Grassroots/main/FC_with_websites_postcodes.csv";
+var csvUrl = "https://raw.githubusercontent.com/Ndio-S/Grassroots/refs/heads/main/FC_with_leagues.csv";
 var map = L.map("map").setView([53.5, -2.5], 6);
 
 // Load OpenStreetMap tiles
