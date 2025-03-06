@@ -4,41 +4,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Grassroots - Find Local Football Clubs</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100">
+
+<!-- Navbar -->
+<header class="w-full bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Grassroots</h1>
+        <nav>
+            <a href="#" class="text-gray-700 mx-4">Home</a>
+            <a href="#" class="text-gray-700 mx-4">Pricing</a>
+            <a href="#" class="text-gray-700 mx-4">About</a>
+            <a href="#" class="text-gray-700 mx-4">Contact</a>
+        </nav>
+        <div>
+            <a href="#" class="text-gray-700 mx-2">Log in</a>
+            <a href="clubs.html" class="px-4 py-2 bg-blue-600 text-white rounded-md">Sign up</a>
+        </div>
+    </div>
+</header>
 
 <!-- Hero Section -->
-<section class="hero">
-    <div class="hero-content">
-        <h1>Discover Football Clubs Near You</h1>
-        <p>Support your local teams and be part of the grassroots movement.</p>
-        <a href="clubs.html" class="cta-button">Find Your Club</a>
+<section class="w-full flex flex-col md:flex-row items-center justify-center text-center md:text-left py-20 px-6">
+    <div class="max-w-lg">
+        <h2 class="text-4xl font-bold text-gray-900 leading-tight">
+            The best way to find and support local football clubs.
+        </h2>
+        <p class="text-gray-600 mt-4">Enter your location and explore football clubs near you.</p>
+        <div class="mt-6 flex justify-center md:justify-start">
+            <a href="clubs.html" class="px-6 py-3 bg-blue-600 text-white rounded-md mr-4">Find Your Club</a>
+            <a href="#" class="px-6 py-3 border border-gray-600 rounded-md">See How It Works</a>
+        </div>
     </div>
-</section>
-
-<!-- Features Section -->
-<section class="features">
-    <h2>Why Use Grassroots?</h2>
-    <div class="features-container">
-        <div class="feature-box">
-            <h3>📍 Location-Based Search</h3>
-            <p>Find clubs near your location and explore teams in your area.</p>
-        </div>
-        <div class="feature-box">
-            <h3>⚽ Club Details</h3>
-            <p>Learn about club history, leagues, stadiums, and more.</p>
-        </div>
-        <div class="feature-box">
-            <h3>🌍 Support Local Football</h3>
-            <p>Connect with your community and help grassroots teams grow.</p>
-        </div>
+    <div class="w-96 h-96 flex items-center justify-center">
+        <img src="https://source.unsplash.com/500x500/?football,soccer" alt="Football image" class="rounded-lg shadow-lg">
     </div>
 </section>
 
 <!-- Footer -->
-<footer>
+<footer class="w-full bg-white py-6 text-center text-gray-700">
     <p>© 2024 Grassroots. All Rights Reserved.</p>
 </footer>
 
