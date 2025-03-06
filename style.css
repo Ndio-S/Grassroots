@@ -1,4 +1,23 @@
-body { font-family: Arial, sans-serif; text-align: center; }
+:root {
+    --primary-color: #f0f0f0;
+    --secondary-color: #e0e0e0;
+    --tertiary-color: #d0d0d0;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    text-align: center; 
+    background-color: var(--primary-color);
+}
+
+body.alternate-1 {
+    background-color: var(--secondary-color);
+}
+
+body.alternate-2 {
+    background-color: var(--tertiary-color);
+}
+
 #map { 
     height: 500px;  /* Ensure the map is visible */
     width: 80%; 
