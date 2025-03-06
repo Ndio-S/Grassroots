@@ -1,46 +1,88 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Grassroots - Find Local Football Clubs</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-</head>
-<body>
+/* General Styles */
+body {
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    color: #333;
+}
 
-<!-- Hero Section -->
-<section class="hero">
-    <div class="hero-content">
-        <h1>Discover Football Clubs Near You</h1>
-        <p>Support your local teams and be part of the grassroots movement.</p>
-        <a href="clubs.html" class="cta-button">Find Your Club</a>
-    </div>
-</section>
+/* Hero Section */
+.hero {
+    height: 100vh;
+    background: url('https://source.unsplash.com/1600x900/?football,soccer') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
 
-<!-- Features Section -->
-<section class="features">
-    <h2>Why Use Grassroots?</h2>
-    <div class="features-container">
-        <div class="feature-box">
-            <h3>📍 Location-Based Search</h3>
-            <p>Find clubs near your location and explore teams in your area.</p>
-        </div>
-        <div class="feature-box">
-            <h3>⚽ Club Details</h3>
-            <p>Learn about club history, leagues, stadiums, and more.</p>
-        </div>
-        <div class="feature-box">
-            <h3>🌍 Support Local Football</h3>
-            <p>Connect with your community and help grassroots teams grow.</p>
-        </div>
-    </div>
-</section>
+.hero-content {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 40px;
+    border-radius: 10px;
+}
 
-<!-- Footer -->
-<footer>
-    <p>© 2024 Grassroots. All Rights Reserved.</p>
-</footer>
+h1 {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
 
-</body>
-</html>
+p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* CTA Button */
+.cta-button {
+    display: inline-block;
+    padding: 14px 28px;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    background: #d32f2f;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: 0.3s ease;
+}
+
+.cta-button:hover {
+    background: #b71c1c;
+}
+
+/* Features Section */
+.features {
+    padding: 60px 20px;
+    background: #f9f9f9;
+}
+
+.features h2 {
+    font-size: 32px;
+    margin-bottom: 30px;
+}
+
+.features-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.feature-box {
+    width: 300px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+/* Footer */
+footer {
+    background: #333;
+    color: white;
+    padding: 20px;
+    font-size: 14px;
+}
