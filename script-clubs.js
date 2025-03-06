@@ -1,17 +1,22 @@
 var csvUrl = "https://raw.githubusercontent.com/Ndio-S/Grassroots/refs/heads/main/FC_with_leagues.csv";
-var map = L.map("map").setView([53.5, -2.5], 6);
+var map;
 
-// Load OpenStreetMap tiles
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
-}).addTo(map);
+// Function to initialize the map only once
+function initializeMap() {
+    if (typeof map !== "undefined" && map.remove) {
+        map.remove();
+    }
+    map = L.map("map").setView([53.5, -2.5], 6);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+}
 
 // Function to get lat/lon from a postcode using OpenStreetMap API
 async function getCoordinates(postcode) {
     let url = `https://nominatim.openstreetmap.org/search?format=json&q=${postcode}`;
     let response = await fetch(url);
     let data = await response.json();
-
     if (data.length > 0) {
         return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
     } else {
@@ -19,9 +24,9 @@ async function getCoordinates(postcode) {
     }
 }
 
-// Function to calculate distance (Haversine Formula)
+// Function to calculate distance using Haversine formula
 function getDistance(lat1, lon1, lat2, lon2) {
-    var R = 6371; // Earth's radius in km
+    var R = 6371;
     var dLat = (lat2 - lat1) * (Math.PI / 180);
     var dLon = (lon2 - lon1) * (Math.PI / 180);
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -31,11 +36,10 @@ function getDistance(lat1, lon1, lat2, lon2) {
     return R * c; // Distance in km
 }
 
-// Function to search clubs based on proximity
+// Function to search for clubs based on proximity to entered postcode
 async function searchClubs() {
     var postcode = document.getElementById("postcode").value.trim();
-    console.log("User entered postcode:", postcode); // Debugging
-
+    console.log("User entered postcode:", postcode);
     if (!postcode) {
         alert("Please enter a postcode.");
         return;
@@ -48,13 +52,12 @@ async function searchClubs() {
     }
 
     console.log("User Location:", userLocation);
-
+    
     Papa.parse(csvUrl, {
         download: true,
         header: true,
         complete: function (results) {
             console.log("CSV Loaded:", results.data.length, "records");
-
             var clubList = document.getElementById("club-list");
             clubList.innerHTML = "";
             var foundClubs = [];
@@ -64,8 +67,7 @@ async function searchClubs() {
                     var clubLat = parseFloat(club.Latitude);
                     var clubLon = parseFloat(club.Longitude);
                     var distance = getDistance(userLocation.lat, userLocation.lon, clubLat, clubLon);
-
-                    if (distance <= 10) { // Clubs within 10 miles (~16km)
+                    if (distance <= 10) {
                         foundClubs.push({ 
                             name: club["Club Name"],
                             league: club["League"] || "Unknown",
@@ -74,17 +76,13 @@ async function searchClubs() {
                             lat: clubLat,
                             lon: clubLon
                         });
-
-                        // Add marker to map
                         L.marker([clubLat, clubLon])
                             .addTo(map)
                             .bindPopup(`<b>${club["Club Name"]}</b><br><a href="${club["Website"]}" target="_blank">Visit Website</a>`);
                     }
                 }
             });
-
             console.log("Matching clubs found:", foundClubs.length);
-
             if (foundClubs.length === 0) {
                 clubList.innerHTML = "<p>No clubs found within 10 miles. Try another postcode.</p>";
             } else {
@@ -96,3 +94,6 @@ async function searchClubs() {
         }
     });
 }
+
+// Initialize the map on page load
+initializeMap();
