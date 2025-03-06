@@ -1,85 +1,46 @@
-/* General Styles */
-body {
-    font-family: "Montserrat", sans-serif;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grassroots - Find Local Football Clubs</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+</head>
+<body>
 
-/* Header Styling */
-.header {
-    background-color: #d32f2f;
-    color: white;
-    padding: 80px;
-}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Discover Football Clubs Near You</h1>
+        <p>Support your local teams and be part of the grassroots movement.</p>
+        <a href="clubs.html" class="cta-button">Find Your Club</a>
+    </div>
+</section>
 
-h1 {
-    font-size: 36px;
-    margin-bottom: 10px;
-}
+<!-- Features Section -->
+<section class="features">
+    <h2>Why Use Grassroots?</h2>
+    <div class="features-container">
+        <div class="feature-box">
+            <h3>📍 Location-Based Search</h3>
+            <p>Find clubs near your location and explore teams in your area.</p>
+        </div>
+        <div class="feature-box">
+            <h3>⚽ Club Details</h3>
+            <p>Learn about club history, leagues, stadiums, and more.</p>
+        </div>
+        <div class="feature-box">
+            <h3>🌍 Support Local Football</h3>
+            <p>Connect with your community and help grassroots teams grow.</p>
+        </div>
+    </div>
+</section>
 
-.start-button {
-    margin-top: 20px;
-    padding: 12px 24px;
-    font-size: 18px;
-}
+<!-- Footer -->
+<footer>
+    <p>© 2024 Grassroots. All Rights Reserved.</p>
+</footer>
 
-/* Clubs Page Layout */
-.container {
-    display: flex;
-    height: 100vh;
-}
-
-.left-panel {
-    width: 40%;
-    padding: 20px;
-    overflow-y: auto;
-    background: #fff;
-    border-right: 2px solid #ddd;
-}
-
-.right-panel {
-    width: 60%;
-    height: 100%;
-    background: #f5f5f5;
-}
-
-#map {
-    width: 100%;
-    height: 100%;
-}
-
-/* Club List Styling */
-.club-item {
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-    text-align: left;
-}
-
-.club-item a {
-    text-decoration: none;
-    color: #d32f2f;
-    font-weight: bold;
-}
-
-.club-item a:hover {
-    text-decoration: underline;
-}
-
-/* Input Box Styling */
-input {
-    width: 60%;
-    padding: 10px;
-    font-size: 16px;
-    margin-top: 10px;
-}
-
-/* Responsive Design */
-@media screen and (max-width: 768px) {
-    .container {
-        flex-direction: column;
-    }
-    .left-panel, .right-panel {
-        width: 100%;
-    }
-}
+</body>
+</html>
