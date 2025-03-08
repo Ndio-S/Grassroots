@@ -26,20 +26,24 @@ async function getCoordinates(postcode) {
 
 // Function to calculate distance using Haversine formula
 function getDistance(lat1, lon1, lat2, lon2) {
-    var R = 6371;
+    var R = 6371; // Earth's radius in km
     var dLat = (lat2 - lat1) * (Math.PI / 180);
     var dLon = (lon2 - lon1) * (Math.PI / 180);
     var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
             Math.sin(dLon / 2) * Math.sin(dLon / 2);
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
+    return R * c * 0.621371; // Convert km to miles
 }
 
 // Function to search for clubs based on proximity to entered postcode
 async function searchClubs() {
     var postcode = document.getElementById("postcode").value.trim();
+    var selectedDistance = parseFloat(document.getElementById("distance").value);
+    
     console.log("User entered postcode:", postcode);
+    console.log("Selected distance:", selectedDistance, "miles");
+
     if (!postcode) {
         alert("Please enter a postcode.");
         return;
@@ -67,7 +71,8 @@ async function searchClubs() {
                     var clubLat = parseFloat(club.Latitude);
                     var clubLon = parseFloat(club.Longitude);
                     var distance = getDistance(userLocation.lat, userLocation.lon, clubLat, clubLon);
-                    if (distance <= 10) {
+
+                    if (distance <= selectedDistance) { // Filter clubs based on chosen distance
                         foundClubs.push({ 
                             name: club["Club Name"],
                             league: club["League"] || "Unknown",
@@ -82,9 +87,10 @@ async function searchClubs() {
                     }
                 }
             });
+
             console.log("Matching clubs found:", foundClubs.length);
             if (foundClubs.length === 0) {
-                clubList.innerHTML = "<p>No clubs found within 10 miles. Try another postcode.</p>";
+                clubList.innerHTML = `<p>No clubs found within ${selectedDistance} miles. Try another postcode.</p>`;
             } else {
                 foundClubs.forEach(club => {
                     clubList.innerHTML += `<li><b>${club.name}</b> - ${club.league} (${club.distance} miles away) 
