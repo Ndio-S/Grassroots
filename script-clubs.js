@@ -13,36 +13,14 @@ function initializeMap() {
 }
 
 // Function to get lat/lon from a postcode using OpenStreetMap API
-async function getCoordinates(postcode) {
-    let url = `https://nominatim.openstreetmap.org/search?format=json&q=${postcode}`;
-    let response = await fetch(url);
-    let data = await response.json();
-    if (data.length > 0) {
-        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-    } else {
-        return null;
-    }
-}
-
-// Function to calculate distance using Haversine formula
-function getDistance(lat1, lon1, lat2, lon2) {
-    var R = 6371; // Earth's radius in km
-    var dLat = (lat2 - lat1) * (Math.PI / 180);
-    var dLon = (lon2 - lon1) * (Math.PI / 180);
-    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c * 0.621371; // Convert km to miles
-}
-
-// Function to search for clubs based on proximity to entered postcode
 async function searchClubs() {
     var postcode = document.getElementById("postcode").value.trim();
     var selectedDistance = parseFloat(document.getElementById("distance").value);
-    
+    var selectedTier = parseInt(document.getElementById("league-tier").value);
+
     console.log("User entered postcode:", postcode);
     console.log("Selected distance:", selectedDistance, "miles");
+    console.log("Selected tier:", selectedTier, "and below");
 
     if (!postcode) {
         alert("Please enter a postcode.");
@@ -56,7 +34,7 @@ async function searchClubs() {
     }
 
     console.log("User Location:", userLocation);
-    
+
     Papa.parse(csvUrl, {
         download: true,
         header: true,
@@ -67,33 +45,38 @@ async function searchClubs() {
             var foundClubs = [];
 
             results.data.forEach(club => {
-                if (club.Latitude && club.Longitude) {
+                if (club.Latitude && club.Longitude && club.Tier) {
                     var clubLat = parseFloat(club.Latitude);
                     var clubLon = parseFloat(club.Longitude);
+                    var clubTier = parseInt(club.Tier);
                     var distance = getDistance(userLocation.lat, userLocation.lon, clubLat, clubLon);
 
-                    if (distance <= selectedDistance) { // Filter clubs based on chosen distance
+                    // Apply both distance filter and tier filter
+                    if (distance <= selectedDistance && clubTier >= selectedTier) {
                         foundClubs.push({ 
                             name: club["Club Name"],
                             league: club["League"] || "Unknown",
                             website: club["Website"],
                             distance: distance.toFixed(1),
+                            tier: clubTier,
                             lat: clubLat,
                             lon: clubLon
                         });
+
                         L.marker([clubLat, clubLon])
                             .addTo(map)
-                            .bindPopup(`<b>${club["Club Name"]}</b><br><a href="${club["Website"]}" target="_blank">Visit Website</a>`);
+                            .bindPopup(`<b>${club["Club Name"]}</b><br>League: ${club["League"]}
+                                <br>Tier: ${clubTier}<br><a href="${club["Website"]}" target="_blank">Visit Website</a>`);
                     }
                 }
             });
 
             console.log("Matching clubs found:", foundClubs.length);
             if (foundClubs.length === 0) {
-                clubList.innerHTML = `<p>No clubs found within ${selectedDistance} miles. Try another postcode.</p>`;
+                clubList.innerHTML = `<p>No clubs found within ${selectedDistance} miles in selected tiers. Try another postcode.</p>`;
             } else {
                 foundClubs.forEach(club => {
-                    clubList.innerHTML += `<li><b>${club.name}</b> - ${club.league} (${club.distance} miles away) 
+                    clubList.innerHTML += `<li><b>${club.name}</b> - ${club.league} (Tier ${club.tier}, ${club.distance} miles away) 
                         <br><a href="${club.website}" target="_blank">Visit Website</a></li>`;
                 });
             }
