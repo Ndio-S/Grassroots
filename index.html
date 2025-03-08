@@ -22,12 +22,26 @@
     </div>
 </header>
 
-<!-- Hero Section -->
-<section class="w-full flex flex-col items-center justify-center text-center py-20 px-6">
-    <div class="max-w-lg">
+<!-- Hero Section with Video Background -->
+<section class="w-full relative flex flex-col items-center justify-center text-center py-20 px-6">
+    <!-- Video Background -->
+    <video autoplay loop muted playsinline class="absolute top-0 left-0 w-full h-full object-cover">
+        <source src="https://raw.githubusercontent.com/Ndio-S/Grassroots/main/123.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Dark Overlay for Readability -->
+    <div class="absolute top-0 left-0 w-full h-full bg-black opacity-50"></div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 max-w-lg text-white">
         <h2 class="text-4xl font-bold">Discover Local Football Clubs</h2>
-        <p class="text-gray-600 mt-4"> Helping you find football clubs near you! <br>Get involved!</br> </p>
-        <a href="clubs.html" class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">Get Started</a>
+        <p class="text-gray-300 mt-4">
+            Helping you find football clubs near you! <br> Get involved!
+        </p>
+        <a href="clubs.html" class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            Get Started
+        </a>
     </div>
 </section>
 
