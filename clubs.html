@@ -25,26 +25,42 @@
     </div>
 </header>
 
-<!-- Search Section -->
-<section class="max-w-3xl mx-auto text-center py-12">
-    <h2 class="text-3xl font-bold">Find Football Clubs Near You</h2>
-    <p class="text-gray-600 mt-2">Enter your postcode to discover local teams and their stadiums.</p>
-    <div class="mt-6 flex justify-center">
-        <input type="text" id="postcode" placeholder="Enter postcode" class="px-4 py-2 border rounded-md w-64">
-        <button onclick="searchClubs()" class="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+<!-- Search Filters Section -->
+<section class="w-full flex flex-col items-center justify-center text-center py-6">
+    <h3 class="text-2xl font-bold mb-4">Find Football Clubs Near You</h3>
+
+    <!-- Input Fields in One Line -->
+    <div class="flex flex-wrap justify-center items-center gap-4">
+        <!-- Postcode Input -->
+        <input type="text" id="postcode" placeholder="Enter postcode" class="border px-4 py-2 rounded-md">
+
+        <!-- Distance Selector -->
+        <select id="distance" class="border px-4 py-2 rounded-md">
+            <option value="5">5 miles</option>
+            <option value="10" selected>10 miles</option>
+            <option value="20">20 miles</option>
+            <option value="50">50 miles</option>
+        </select>
+
+        <!-- League Tier Selector -->
+        <select id="league-tier" class="border px-4 py-2 rounded-md">
+            <option value="10">All Tiers</option>
+            <option value="2">Second Division & Below</option>
+            <option value="3">Third Division & Below</option>
+            <option value="4">Fourth Division & Below</option>
+            <option value="5">National League & Below</option>
+            <option value="6">Regional Divisions & Below</option>
+            <option value="7">Top Regional Leagues & Below</option>
+            <option value="8">Regional Divisions & Below</option>
+            <option value="9">County Leagues & Below</option>
+        </select>
+
+        <!-- Search Button -->
+        <button onclick="searchClubs()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
             Find Clubs
         </button>
     </div>
 </section>
-
-<!-- Distance Selector -->
-<label for="distance">Select Distance:</label>
-<select id="distance">
-    <option value="5">5 miles</option>
-    <option value="10" selected>10 miles</option>
-    <option value="20">20 miles</option>
-    <option value="50">50 miles</option>
-</select>
 
 <!-- Results & Map Layout -->
 <section class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -60,9 +76,35 @@
     </div>
 </section>
 
+<!-- League Tier Table -->
+<section class="w-full flex flex-col items-center justify-center text-center py-6">
+    <h3 class="text-2xl font-bold mb-4">League Tiers in England</h3>
+    <div class="overflow-x-auto">
+        <table class="border-collapse border border-gray-300 w-full max-w-2xl mx-auto text-left">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="border border-gray-300 px-4 py-2">Tier</th>
+                    <th class="border border-gray-300 px-4 py-2">League Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td class="border px-4 py-2">1</td><td class="border px-4 py-2">Top Division (Professional)</td></tr>
+                <tr><td class="border px-4 py-2">2</td><td class="border px-4 py-2">Second Division (Professional)</td></tr>
+                <tr><td class="border px-4 py-2">3</td><td class="border px-4 py-2">Third Division (Professional)</td></tr>
+                <tr><td class="border px-4 py-2">4</td><td class="border px-4 py-2">Fourth Division (Professional)</td></tr>
+                <tr><td class="border px-4 py-2">5</td><td class="border px-4 py-2">National League System (Professional/Semi-Professional)</td></tr>
+                <tr><td class="border px-4 py-2">6</td><td class="border px-4 py-2">National League Regional Divisions (Semi-Professional)</td></tr>
+                <tr><td class="border px-4 py-2">7</td><td class="border px-4 py-2">Top Regional Leagues (Semi-Professional)</td></tr>
+                <tr><td class="border px-4 py-2">8</td><td class="border px-4 py-2">Regional Divisions (Semi-Professional)</td></tr>
+                <tr><td class="border px-4 py-2">9</td><td class="border px-4 py-2">County and Regional Leagues (Amateur/Semi-Professional)</td></tr>
+                <tr><td class="border px-4 py-2">10</td><td class="border px-4 py-2">Lower County and Regional Leagues (Amateur)</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
 <!-- Footer -->
 <footer class="w-full bg-white py-6 text-center text-gray-600">
-    <p>2024 Grassroots &#8482</p>
+    <p>2025 Grassroots &#8482</p>
 </footer>
 
 <script src="script-clubs.js"></script>
