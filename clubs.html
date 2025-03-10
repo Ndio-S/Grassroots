@@ -1,112 +1,119 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Find Local Football Clubs - Grassroots</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-</head>
-<body class="bg-gray-100 text-gray-900">
+document.addEventListener("DOMContentLoaded", function () {
+    var csvUrl = "https://raw.githubusercontent.com/Ndio-S/Grassroots/refs/heads/main/FC_with_leagues.csv";
+    var map;
 
-<!-- Navbar -->
-<header class="w-full bg-white shadow-md">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <h1 class="text-2xl font-bold">Grassroots</h1>
-        <nav>
-            <a href="index.html" class="text-gray-700 mx-4">Home</a>
-            <a href="clubs.html" class="text-gray-700 mx-4">Find Clubs</a>
-            <a href="about.html" class="text-gray-700 mx-4">About</a>
-            <a href="https://youtu.be/QQj7chvIq4U?si=S7n2fcb1C17oMCs5" class="text-gray-700 mx-4" target="_blank">See More!</a>
-        </nav>
-    </div>
-</header>
+    // ✅ Initialize the map correctly
+    function initializeMap() {
+        if (typeof map !== "undefined" && map.remove) {
+            map.remove();
+        }
+        map = L.map("map").setView([53.5, -2.5], 6);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors",
+        }).addTo(map);
+    }
 
-<!-- Search Filters Section -->
-<section class="w-full flex flex-col items-center justify-center text-center py-6">
-    <h3 class="text-2xl font-bold mb-4">Find Football Clubs Near You</h3>
+    // ✅ Function to get latitude & longitude from postcode
+    async function getCoordinates(postcode) {
+        let url = `https://nominatim.openstreetmap.org/search?format=json&q=${postcode}`;
+        try {
+            let response = await fetch(url);
+            let data = await response.json();
+            if (data.length > 0) {
+                return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+            } else {
+                return null;
+            }
+        } catch (error) {
+            console.error("Error fetching coordinates:", error);
+            return null;
+        }
+    }
 
-    <!-- Input Fields in One Line -->
-    <div class="flex flex-wrap justify-center items-center gap-4">
-        <!-- Postcode Input -->
-        <input type="text" id="postcode" placeholder="Enter postcode" class="border px-4 py-2 rounded-md">
+    // ✅ Function to calculate distance (Haversine formula)
+    function getDistance(lat1, lon1, lat2, lon2) {
+        var R = 6371;
+        var dLat = (lat2 - lat1) * (Math.PI / 180);
+        var dLon = (lon2 - lon1) * (Math.PI / 180);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
 
-        <!-- Distance Selector -->
-        <select id="distance" class="border px-4 py-2 rounded-md">
-            <option value="5">5 miles</option>
-            <option value="10" selected>10 miles</option>
-            <option value="20">20 miles</option>
-            <option value="50">50 miles</option>
-        </select>
+    // ✅ Function to search for clubs based on postcode & distance
+    async function searchClubs() {
+        var postcode = document.getElementById("postcode").value.trim();
+        var selectedDistance = parseFloat(document.getElementById("distance").value);
 
-        <!-- League Tier Selector -->
-        <select id="league-tier" class="border px-4 py-2 rounded-md">
-            <option value="10">All Tiers</option>
-            <option value="2">Second Division & Below</option>
-            <option value="3">Third Division & Below</option>
-            <option value="4">Fourth Division & Below</option>
-            <option value="5">National League & Below</option>
-            <option value="6">Regional Divisions & Below</option>
-            <option value="7">Top Regional Leagues & Below</option>
-            <option value="8">Regional Divisions & Below</option>
-            <option value="9">County Leagues & Below</option>
-        </select>
+        console.log("User entered postcode:", postcode);
+        console.log("Selected distance:", selectedDistance, "miles");
 
-        <!-- Search Button -->
-        <button onclick="searchClubs()" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-            Find Clubs
-        </button>
-    </div>
-</section>
+        if (!postcode) {
+            alert("Please enter a postcode.");
+            return;
+        }
 
-<!-- Results & Map Layout -->
-<section class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-    <!-- Club List -->
-    <div class="bg-white p-6 rounded-md shadow-md">
-        <h3 class="text-xl font-semibold mb-4">Nearby Clubs</h3>
-        <ul id="club-list" class="space-y-4 text-left"></ul>
-    </div>
+        let userLocation = await getCoordinates(postcode);
+        if (!userLocation) {
+            alert("Invalid postcode. Try again.");
+            return;
+        }
 
-    <!-- Map -->
-    <div class="h-[500px] bg-white rounded-md shadow-md overflow-hidden">
-        <div id="map" class="h-full w-full"></div>
-    </div>
-</section>
+        console.log("User Location:", userLocation);
 
-<!-- League Tier Table -->
-<section class="w-full flex flex-col items-center justify-center text-center py-6">
-    <h3 class="text-2xl font-bold mb-4">League Tiers in England</h3>
-    <div class="overflow-x-auto">
-        <table class="border-collapse border border-gray-300 w-full max-w-2xl mx-auto text-left">
-            <thead class="bg-gray-200">
-                <tr>
-                    <th class="border border-gray-300 px-4 py-2">Tier</th>
-                    <th class="border border-gray-300 px-4 py-2">League Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr><td class="border px-4 py-2">1</td><td class="border px-4 py-2">Top Division (Professional)</td></tr>
-                <tr><td class="border px-4 py-2">2</td><td class="border px-4 py-2">Second Division (Professional)</td></tr>
-                <tr><td class="border px-4 py-2">3</td><td class="border px-4 py-2">Third Division (Professional)</td></tr>
-                <tr><td class="border px-4 py-2">4</td><td class="border px-4 py-2">Fourth Division (Professional)</td></tr>
-                <tr><td class="border px-4 py-2">5</td><td class="border px-4 py-2">National League System (Professional/Semi-Professional)</td></tr>
-                <tr><td class="border px-4 py-2">6</td><td class="border px-4 py-2">National League Regional Divisions (Semi-Professional)</td></tr>
-                <tr><td class="border px-4 py-2">7</td><td class="border px-4 py-2">Top Regional Leagues (Semi-Professional)</td></tr>
-                <tr><td class="border px-4 py-2">8</td><td class="border px-4 py-2">Regional Divisions (Semi-Professional)</td></tr>
-                <tr><td class="border px-4 py-2">9</td><td class="border px-4 py-2">County and Regional Leagues (Amateur/Semi-Professional)</td></tr>
-                <tr><td class="border px-4 py-2">10</td><td class="border px-4 py-2">Lower County and Regional Leagues (Amateur)</td></tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-<!-- Footer -->
-<footer class="w-full bg-white py-6 text-center text-gray-600">
-    <p>2025 Grassroots &#8482</p>
-</footer>
+        // ✅ Parse CSV and filter data
+        Papa.parse(csvUrl, {
+            download: true,
+            header: true,
+            complete: function (results) {
+                console.log("CSV Loaded:", results.data.length, "records");
+                var clubList = document.getElementById("club-list");
+                clubList.innerHTML = "";
+                var foundClubs = [];
 
-<script src="script-clubs.js"></script>
-</body>
-</html>
+                results.data.forEach(club => {
+                    if (club.Latitude && club.Longitude) {
+                        var clubLat = parseFloat(club.Latitude);
+                        var clubLon = parseFloat(club.Longitude);
+                        var distance = getDistance(userLocation.lat, userLocation.lon, clubLat, clubLon);
+
+                        // ✅ Apply only distance filter
+                        if (distance <= selectedDistance) {
+                            foundClubs.push({ 
+                                name: club["Club Name"],
+                                league: club["League"] || "Unknown",
+                                website: club["Website"],
+                                distance: distance.toFixed(1),
+                                lat: clubLat,
+                                lon: clubLon
+                            });
+
+                            L.marker([clubLat, clubLon])
+                                .addTo(map)
+                                .bindPopup(`<b>${club["Club Name"]}</b><br>League: ${club["League"]}
+                                    <br><a href="${club["Website"]}" target="_blank">Visit Website</a>`);
+                        }
+                    }
+                });
+
+                console.log("Matching clubs found:", foundClubs.length);
+                if (foundClubs.length === 0) {
+                    clubList.innerHTML = `<p>No clubs found within ${selectedDistance} miles. Try another postcode.</p>`;
+                } else {
+                    foundClubs.forEach(club => {
+                        clubList.innerHTML += `<li><b>${club.name}</b> - ${club.league} (${club.distance} miles away) 
+                            <br><a href="${club.website}" target="_blank">Visit Website</a></li>`;
+                    });
+                }
+            }
+        });
+    }
+
+    // ✅ Attach event listener for the search button
+    document.getElementById("search-button").addEventListener("click", searchClubs);
+
+    // ✅ Initialize the map on page load
+    initializeMap();
+});
