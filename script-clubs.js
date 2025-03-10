@@ -1,5 +1,6 @@
 var csvUrl = "https://raw.githubusercontent.com/Ndio-S/Grassroots/refs/heads/main/FC_with_leagues.csv";
 var map;
+var markers = []; // Store markers to remove them when distance changes
 
 // Initialize the map
 function initializeMap() {
@@ -12,7 +13,7 @@ function initializeMap() {
     }).addTo(map);
 }
 
-// Get latitude and longitude from a postcode using OpenStreetMap API
+// Get latitude and longitude from a postcode
 async function getCoordinates(postcode) {
     let url = `https://nominatim.openstreetmap.org/search?format=json&q=${postcode}`;
     let response = await fetch(url);
@@ -24,7 +25,7 @@ async function getCoordinates(postcode) {
     }
 }
 
-// Calculate distance between two coordinates using Haversine formula
+// Calculate distance using Haversine formula
 function getDistance(lat1, lon1, lat2, lon2) {
     var R = 6371;
     var dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -36,7 +37,7 @@ function getDistance(lat1, lon1, lat2, lon2) {
     return R * c * 0.621371; // Convert km to miles
 }
 
-// Search for clubs based on proximity
+// Function to search for clubs and update the map
 async function searchClubs() {
     var postcode = document.getElementById("postcode").value.trim();
     var selectedDistance = parseFloat(document.getElementById("distance").value);
@@ -56,7 +57,14 @@ async function searchClubs() {
     }
 
     console.log("User Location:", userLocation);
-    
+
+    // Clear previous markers
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+
+    // Center the map on the new location
+    map.setView([userLocation.lat, userLocation.lon], 10);
+
     Papa.parse(csvUrl, {
         download: true,
         header: true,
@@ -82,10 +90,12 @@ async function searchClubs() {
                             lon: clubLon
                         });
 
-                        L.marker([clubLat, clubLon])
-                            .addTo(map)
+                        // Create map marker and store it
+                        var marker = L.marker([clubLat, clubLon]).addTo(map)
                             .bindPopup(`<b>${club["Club Name"]}</b><br>
-                                        <a href="${club["Website"]}" target="_blank">Visit Website</a>`);
+                                        <a href="${club["Website"]}" target="_blank">Visit Website</a><br>
+                                        <a href="https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lon}&destination=${clubLat},${clubLon}" target="_blank">Get Directions</a>`);
+                        markers.push(marker);
                     }
                 }
             });
@@ -96,7 +106,8 @@ async function searchClubs() {
             } else {
                 foundClubs.forEach(club => {
                     clubList.innerHTML += `<li><b>${club.name}</b> - ${club.league} (${club.distance} miles away) 
-                        <br><a href="${club.website}" target="_blank">Visit Website</a></li>`;
+                        <br><a href="${club.website}" target="_blank">Visit Website</a> |
+                        <a href="https://www.google.com/maps/dir/?api=1&origin=${userLocation.lat},${userLocation.lon}&destination=${club.lat},${club.lon}" target="_blank">Get Directions</a></li>`;
                 });
             }
         }
