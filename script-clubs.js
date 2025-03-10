@@ -12,24 +12,19 @@ function initializeMap() {
     }).addTo(map);
 }
 
-// Function to get latitude and longitude from a postcode
+// Get latitude and longitude from a postcode using OpenStreetMap API
 async function getCoordinates(postcode) {
     let url = `https://nominatim.openstreetmap.org/search?format=json&q=${postcode}`;
-    try {
-        let response = await fetch(url);
-        let data = await response.json();
-        if (data.length > 0) {
-            return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-        } else {
-            return null;
-        }
-    } catch (error) {
-        console.error("Error fetching coordinates:", error);
+    let response = await fetch(url);
+    let data = await response.json();
+    if (data.length > 0) {
+        return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+    } else {
         return null;
     }
 }
 
-// Function to calculate distance using Haversine formula
+// Calculate distance between two coordinates using Haversine formula
 function getDistance(lat1, lon1, lat2, lon2) {
     var R = 6371;
     var dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -38,10 +33,10 @@ function getDistance(lat1, lon1, lat2, lon2) {
             Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
             Math.sin(dLon / 2) * Math.sin(dLon / 2);
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
+    return R * c * 0.621371; // Convert km to miles
 }
 
-// Function to search for clubs based on postcode and distance
+// Search for clubs based on proximity
 async function searchClubs() {
     var postcode = document.getElementById("postcode").value.trim();
     var selectedDistance = parseFloat(document.getElementById("distance").value);
@@ -61,8 +56,7 @@ async function searchClubs() {
     }
 
     console.log("User Location:", userLocation);
-
-    // Parse CSV and filter data
+    
     Papa.parse(csvUrl, {
         download: true,
         header: true,
@@ -78,7 +72,6 @@ async function searchClubs() {
                     var clubLon = parseFloat(club.Longitude);
                     var distance = getDistance(userLocation.lat, userLocation.lon, clubLat, clubLon);
 
-                    // Apply only distance filter
                     if (distance <= selectedDistance) {
                         foundClubs.push({ 
                             name: club["Club Name"],
@@ -91,8 +84,8 @@ async function searchClubs() {
 
                         L.marker([clubLat, clubLon])
                             .addTo(map)
-                            .bindPopup(`<b>${club["Club Name"]}</b><br>League: ${club["League"]}
-                                <br><a href="${club["Website"]}" target="_blank">Visit Website</a>`);
+                            .bindPopup(`<b>${club["Club Name"]}</b><br>
+                                        <a href="${club["Website"]}" target="_blank">Visit Website</a>`);
                     }
                 }
             });
@@ -109,9 +102,6 @@ async function searchClubs() {
         }
     });
 }
-
-// Attach event listener for the search button
-document.getElementById("search-button").addEventListener("click", searchClubs);
 
 // Initialize the map on page load
 initializeMap();
