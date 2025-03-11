@@ -113,6 +113,53 @@ async function searchClubs() {
         }
     });
 }
+// Function to populate the tier table
+async function loadLeagueTiers() {
+    Papa.parse(csvUrl, {
+        download: true,
+        header: true,
+        complete: function (results) {
+            console.log("CSV Loaded:", results.data.length, "records");
 
+            let tierData = {
+                1: { name: "Top Division (Professional)", leagues: new Set() },
+                2: { name: "Second Division (Professional)", leagues: new Set() },
+                3: { name: "Third Division (Professional)", leagues: new Set() },
+                4: { name: "Fourth Division (Professional)", leagues: new Set() },
+                5: { name: "National League System (Professional/Semi-Professional)", leagues: new Set() },
+                6: { name: "National League Regional Divisions (Semi-Professional)", leagues: new Set() },
+                7: { name: "Top Regional Leagues (Semi-Professional)", leagues: new Set() },
+                8: { name: "Regional Divisions (Semi-Professional)", leagues: new Set() },
+                9: { name: "County and Regional Leagues (Amateur/Semi-Professional)", leagues: new Set() },
+                10: { name: "Lower County and Regional Leagues (Amateur)", leagues: new Set() }
+            };
+
+            results.data.forEach(club => {
+                let tier = club["Tier"] ? parseInt(club["Tier"]) : null;
+                let league = club["League"] || "Unknown League";
+
+                if (tier && tierData[tier]) {
+                    tierData[tier].leagues.add(league);
+                }
+            });
+
+            // Populate the table
+            let tableBody = document.getElementById("tier-table-body");
+            tableBody.innerHTML = ""; // Clear old data
+
+            Object.keys(tierData).forEach(tier => {
+                let row = document.createElement("tr");
+                row.innerHTML = `
+                    <td class="border border-gray-400 px-4 py-2 font-bold">Tier ${tier} - ${tierData[tier].name}</td>
+                    <td class="border border-gray-400 px-4 py-2">${Array.from(tierData[tier].leagues).join(", ")}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+    });
+}
+
+// Load table on page load
+document.addEventListener("DOMContentLoaded", loadLeagueTiers);
 // Initialize the map on page load
 initializeMap();
