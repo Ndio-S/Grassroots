@@ -1,6 +1,6 @@
 /* General Styles */
 body {
-    font-family: "Inter", sans-serif;
+    font-family: "Poppins", sans-serif;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -85,4 +85,7 @@ footer {
     color: white;
     padding: 20px;
     font-size: 14px;
+    border-top-width: 5px;
+    border-top-style: solid;
+    border-top-color: #333;
 }
